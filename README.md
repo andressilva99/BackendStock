@@ -1,3 +1,5 @@
+🗄️ BACKSTOCK
+
 Este proyecto consiste en el desarrollo de una página web con frontend en JavaScript y backend conectado a MongoDB, orientado a la gestión de stock de productos por parte de un usuario administrador.
 
 🚀 ¿Qué hace esta app?
