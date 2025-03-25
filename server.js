@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const Usuario = require('./models/usuario'); 
+const Producto = require('./models/productos');
 const cors = require('cors');
 
 const app = express();
@@ -14,6 +15,8 @@ mongoose.connect(MONGO_URI, {
 })
 .then(() => console.log('✅ Conectado a MongoDB'))
 .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
+
+//MANEJO DE USUARIOS//
 
 app.post('/register', async (req, res) => {
   try {
@@ -33,6 +36,48 @@ app.post('/register', async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ mensaje: 'Error al registrar usuario', error });
+  }
+});
+
+
+
+
+//MANEJO DE PRODUCTOS//
+
+app.get('/productos', async (req, res) => {
+  const productos = await Producto.find();
+  res.json(productos);
+});
+
+// Agregar producto
+app.post('/productos', async (req, res) => {
+  try {
+    const { Descripcion, FechaIngreso, CantidadActual } = req.body;
+    const ultimo = await Producto.findOne().sort({ IdProducto: -1 });
+    const nuevoId = ultimo ? ultimo.IdProducto + 1 : 1;
+
+    const nuevoProducto = new Producto({
+      IdProducto: nuevoId,
+      Descripcion,
+      FechaIngreso,
+      CantidadActual
+    });
+
+    await nuevoProducto.save();
+    res.status(201).json({ mensaje: 'Producto agregado', producto: nuevoProducto });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al agregar producto', error });
+  }
+});
+
+// Eliminar producto
+app.delete('/productos/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await Producto.deleteOne({ IdProducto: id });
+    res.json({ mensaje: 'Producto eliminado' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar producto', error });
   }
 });
 
