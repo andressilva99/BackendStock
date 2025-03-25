@@ -81,4 +81,28 @@ app.delete('/productos/:id', async (req, res) => {
   }
 });
 
+// Editar producto (PUT)
+app.put('/productos/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { Descripcion, FechaIngreso, CantidadActual } = req.body;
+
+    const actualizado = await Producto.findOneAndUpdate(
+      { IdProducto: id },
+      { Descripcion, FechaIngreso, CantidadActual },
+      { new: true }
+    );
+
+    if (!actualizado) {
+      return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    }
+
+    res.json({ mensaje: 'Producto actualizado', producto: actualizado });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar producto', error });
+  }
+});
+
+
 app.listen(3000, () => console.log('🚀 Servidor corriendo en http://localhost:3000'));

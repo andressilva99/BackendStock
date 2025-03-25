@@ -23,16 +23,19 @@
     </tbody>
   </table>
 
-  <h3>Agregar Producto</h3>
+  <h3>Agregar / Editar Producto</h3>
   <form id="formAgregar">
     <input type="text" id="descripcion" placeholder="Descripción" required>
     <input type="date" id="fechaIngreso" required>
     <input type="number" id="cantidadActual" placeholder="Cantidad" required>
-    <button type="submit">Agregar</button>
+    <button type="submit" id="btnAgregar">Agregar</button>
+    <button type="button" id="btnActualizar" style="display:none;">Actualizar</button>
+    <button type="button" id="btnCancelar" style="display:none;">Cancelar</button>
   </form>
 
   <script>
-    const apiUrl = 'http://localhost:3000/productos'; // Cambiar según tu backend
+    const apiUrl = 'http://localhost:3000/productos';
+    let productoEditandoId = null;
 
     async function cargarProductos() {
       const res = await fetch(apiUrl);
@@ -49,6 +52,7 @@
           <td>${prod.CantidadActual}</td>
           <td>
             <button onclick="eliminarProducto('${prod.IdProducto}')">Eliminar</button>
+            <button onclick="prepararEdicion(${prod.IdProducto}, '${prod.Descripcion}', '${prod.FechaIngreso}', ${prod.CantidadActual})">Editar</button>
           </td>
         `;
         tabla.appendChild(row);
@@ -60,7 +64,47 @@
       cargarProductos();
     }
 
-    document.getElementById('formAgregar').addEventListener('submit', async (e) => {
+    function prepararEdicion(id, descripcion, fechaIngreso, cantidad) {
+      productoEditandoId = id;
+      document.getElementById('descripcion').value = descripcion;
+      document.getElementById('fechaIngreso').value = fechaIngreso;
+      document.getElementById('cantidadActual').value = cantidad;
+
+      document.getElementById('btnAgregar').style.display = 'none';
+      document.getElementById('btnActualizar').style.display = 'inline-block';
+      document.getElementById('btnCancelar').style.display = 'inline-block';
+    }
+
+    document.getElementById('btnActualizar').addEventListener('click', async () => {
+      const nuevaDesc = document.getElementById('descripcion').value;
+      const nuevaFecha = document.getElementById('fechaIngreso').value;
+      const nuevaCantidad = document.getElementById('cantidadActual').value;
+
+      await fetch(`${apiUrl}/${productoEditandoId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          Descripcion: nuevaDesc,
+          FechaIngreso: nuevaFecha,
+          CantidadActual: nuevaCantidad
+        })
+      });
+
+      cancelarEdicion();
+      cargarProductos();
+    });
+
+    document.getElementById('btnCancelar').addEventListener('click', cancelarEdicion);
+
+    function cancelarEdicion() {
+      document.getElementById('formAgregar').reset();
+      document.getElementById('btnAgregar').style.display = 'inline-block';
+      document.getElementById('btnActualizar').style.display = 'none';
+      document.getElementById('btnCancelar').style.display = 'none';
+      productoEditandoId = null;
+    }
+
+    async function agregarProducto(e) {
       e.preventDefault();
       const descripcion = document.getElementById('descripcion').value;
       const fechaIngreso = document.getElementById('fechaIngreso').value;
@@ -74,7 +118,9 @@
 
       e.target.reset();
       cargarProductos();
-    });
+    }
+
+    document.getElementById('formAgregar').addEventListener('submit', agregarProducto);
 
     cargarProductos();
   </script>
