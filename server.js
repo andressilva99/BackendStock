@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Usuario = require('./models/usuario'); 
 const Producto = require('./models/productos');
+const Role = require('./models/Role')
 const cors = require('cors');
 
 const app = express();
@@ -103,6 +104,72 @@ app.put('/productos/:id', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al actualizar producto', error });
   }
 });
+
+//MANEJO DE ROLES//
+
+app.get('/Role', async (req, res) => {
+  const roles = await Role.find();
+  res.json(roles);
+});
+
+// Agregar Role
+app.post('/Role', async (req, res) => {
+  try {
+    const { Nombre, Edit, Add, Delete, View } = req.body;
+    const ultimo = await Role.findOne().sort({ IdRole: -1 });
+    const nuevoId = ultimo ? ultimo.IdRole + 1 : 1;
+
+    const nuevoRole = new Role({
+      IdRole: nuevoId,
+      Nombre, 
+      Edit, 
+      Add, 
+      Delete, 
+      View
+    });
+
+    await nuevoRole.save();
+    res.status(201).json({ mensaje: 'Role agregado', Role: nuevoRole });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al agregar Role', error });
+  }
+});
+
+// Eliminar role
+app.delete('/Role/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await Role.deleteOne({ IdRole: id });
+    res.json({ mensaje: 'Role eliminado' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar Role', error });
+  }
+});
+
+// Editar role (PUT)
+app.put('/Role/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { Nombre, Edit, Add, Delete, View } = req.body;
+
+    const actualizado = await Role.findOneAndUpdate(
+      { IdRole: id },
+      { Nombre, Edit, Add, Delete, View },
+      { new: true }
+    );
+
+    if (!actualizado) {
+      return res.status(404).json({ mensaje: 'Role no encontrado' });
+    }
+
+    res.json({ mensaje: 'Role actualizado', Role: actualizado });
+
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar producto', error });
+  }
+});
+
+
 
 
 app.listen(3000, () => console.log('🚀 Servidor corriendo en http://localhost:3000'));
