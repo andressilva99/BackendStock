@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const Usuario = require('./models/usuario'); 
 const Producto = require('./models/productos');
-const Role = require('./models/Role')
+const Role = require('./models/Role');
 const cors = require('cors');
 
 const app = express();
@@ -17,13 +17,13 @@ mongoose.connect(MONGO_URI, {
 .then(() => console.log('✅ Conectado a MongoDB'))
 .catch(err => console.error('❌ Error al conectar a MongoDB:', err));
 
-//MANEJO DE USUARIOS//
+// ========== MANEJO DE USUARIOS ==========
 
 app.post('/register', async (req, res) => {
   try {
     const { nombreUsuario, email, contraseña } = req.body;
     const idRol = `ROL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-    
+
     const nuevoUsuario = new Usuario({
       Nombre: nombreUsuario,
       Email: email,
@@ -40,17 +40,13 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
-
-
-//MANEJO DE PRODUCTOS//
+// ========== MANEJO DE PRODUCTOS ==========
 
 app.get('/productos', async (req, res) => {
   const productos = await Producto.find();
   res.json(productos);
 });
 
-// Agregar producto
 app.post('/productos', async (req, res) => {
   try {
     const { Descripcion, FechaIngreso, CantidadActual } = req.body;
@@ -71,18 +67,6 @@ app.post('/productos', async (req, res) => {
   }
 });
 
-// Eliminar producto
-app.delete('/productos/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    await Producto.deleteOne({ IdProducto: id });
-    res.json({ mensaje: 'Producto eliminado' });
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al eliminar producto', error });
-  }
-});
-
-// Editar producto (PUT)
 app.put('/productos/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -105,15 +89,24 @@ app.put('/productos/:id', async (req, res) => {
   }
 });
 
-//MANEJO DE ROLES//
+app.delete('/productos/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    await Producto.deleteOne({ IdProducto: id });
+    res.json({ mensaje: 'Producto eliminado' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar producto', error });
+  }
+});
 
-app.get('/Role', async (req, res) => {
+// ========== MANEJO DE ROLES ==========
+
+app.get('/roles', async (req, res) => {
   const roles = await Role.find();
   res.json(roles);
 });
 
-// Agregar Role
-app.post('/Role', async (req, res) => {
+app.post('/roles', async (req, res) => {
   try {
     const { Nombre, Edit, Add, Delete, View } = req.body;
     const ultimo = await Role.findOne().sort({ IdRole: -1 });
@@ -121,55 +114,40 @@ app.post('/Role', async (req, res) => {
 
     const nuevoRole = new Role({
       IdRole: nuevoId,
-      Nombre, 
-      Edit, 
-      Add, 
-      Delete, 
+      Nombre,
+      Edit,
+      Add,
+      Delete,
       View
     });
 
     await nuevoRole.save();
-    res.status(201).json({ mensaje: 'Role agregado', Role: nuevoRole });
+    res.status(201).json({ mensaje: 'Rol agregado', rol: nuevoRole });
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al agregar Role', error });
+    res.status(500).json({ mensaje: 'Error al agregar rol', error });
   }
 });
 
-// Eliminar role
-app.delete('/Role/:id', async (req, res) => {
+app.put('/roles/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-    await Role.deleteOne({ IdRole: id });
-    res.json({ mensaje: 'Role eliminado' });
-  } catch (error) {
-    res.status(500).json({ mensaje: 'Error al eliminar Role', error });
-  }
-});
-
-// Editar role (PUT)
-app.put('/Role/:id', async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    const { Nombre, Edit, Add, Delete, View } = req.body;
-
     const actualizado = await Role.findOneAndUpdate(
-      { IdRole: id },
-      { Nombre, Edit, Add, Delete, View },
+      { IdRole: parseInt(req.params.id) },
+      req.body,
       { new: true }
     );
-
-    if (!actualizado) {
-      return res.status(404).json({ mensaje: 'Role no encontrado' });
-    }
-
-    res.json({ mensaje: 'Role actualizado', Role: actualizado });
-
+    res.json({ mensaje: 'Rol actualizado', rol: actualizado });
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al actualizar producto', error });
+    res.status(500).json({ mensaje: 'Error al actualizar rol', error });
   }
 });
 
-
-
+app.delete('/roles/:id', async (req, res) => {
+  try {
+    await Role.deleteOne({ IdRole: parseInt(req.params.id) });
+    res.json({ mensaje: 'Rol eliminado' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar rol', error });
+  }
+});
 
 app.listen(3000, () => console.log('🚀 Servidor corriendo en http://localhost:3000'));

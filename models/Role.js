@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const usuarioSchema = new mongoose.Schema({
+const roleSchema = new mongoose.Schema({
   IdRole: { type: Number, unique: true },
   Nombre: String,
   Edit: Boolean,
@@ -10,7 +10,7 @@ const usuarioSchema = new mongoose.Schema({
 });
 
 //autoincrementar el Id
-usuarioSchema.pre('save', async function (next) {
+roleSchema.pre('save', async function (next) {
   if (!this.Id) { // Si no tiene un Id asignado
     const ultimoRole = await mongoose.model('Role').findOne().sort({ Id: -1 });
     this.Id = ultimoRole ? ultimoRole.Id + 1 : 1;
