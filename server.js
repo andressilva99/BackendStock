@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const Usuario = require('./models/usuario'); 
@@ -9,13 +10,17 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const MONGO_URI = 'mongodb://localhost:27017/BACKSTOCK';
+// ========== CONEXIÓN A MONGODB ATLAS ==========
+
+const MONGO_URI = process.env.MONGO_URI;
+
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  serverApi: { version: '1', strict: true, deprecationErrors: true }
 })
-.then(() => console.log('✅ Conectado a MongoDB'))
-.catch(err => console.error('❌ Error al conectar a MongoDB:', err));
+.then(() => console.log('✅ Conectado a MongoDB Atlas'))
+.catch(err => console.error('❌ Error al conectar a MongoDB Atlas:', err));
 
 // ========== MANEJO DE USUARIOS ==========
 
