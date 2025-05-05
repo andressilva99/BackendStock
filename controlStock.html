@@ -110,6 +110,13 @@
       const fechaIngreso = document.getElementById('fechaIngreso').value;
       const cantidadActual = document.getElementById('cantidadActual').value;
 
+
+      console.log({
+    Descripcion: descripcion,
+    FechaIngreso: fechaIngreso,
+    CantidadActual: cantidadActual
+  });
+  
       await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -118,6 +125,7 @@
 
       e.target.reset();
       cargarProductos();
+      
     }
 
     document.getElementById('formAgregar').addEventListener('submit', agregarProducto);
