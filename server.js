@@ -24,12 +24,12 @@ mongoose.connect(MONGO_URI, {
 
 // ========== MANEJO DE USUARIOS ==========
 
-app.get('/usuarios', async (req, res) => {
+app.get('/usuarios', async (req, res) => {   //GET USUARIOS
   const usuarios = await Usuario.find();
   res.json(usuarios);
 });
 
-app.post('/register', async (req, res) => {
+app.post('/usuarios', async (req, res) => {  //POST USUARIOS
   try {
     const { nombreUsuario, email, contraseña } = req.body;
     const idRol = `ROL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
@@ -55,12 +55,12 @@ app.post('/register', async (req, res) => {
 
 // ========== MANEJO DE PRODUCTOS ==========
 
-app.get('/productos', async (req, res) => {
+app.get('/productos', async (req, res) => {  // GET PRODUCTOS
   const productos = await Producto.find();
   res.json(productos);
 });
 
-app.post('/productos', async (req, res) => {
+app.post('/productos', async (req, res) => {  // POST PRODUCTOS
   try {
     const { Descripcion, FechaIngreso, CantidadActual } = req.body;
     const ultimo = await Producto.findOne().sort({ IdProducto: -1 });
@@ -80,7 +80,7 @@ app.post('/productos', async (req, res) => {
   }
 });
 
-app.put('/productos/:id', async (req, res) => {
+app.put('/productos/:id', async (req, res) => {  // PUT PRODUCTOS
   try {
     const id = parseInt(req.params.id);
     const { Descripcion, FechaIngreso, CantidadActual } = req.body;
@@ -102,7 +102,7 @@ app.put('/productos/:id', async (req, res) => {
   }
 });
 
-app.delete('/productos/:id', async (req, res) => {
+app.delete('/productos/:id', async (req, res) => {  // DELETE PRODUCTOS
   try {
     const id = parseInt(req.params.id);
     await Producto.deleteOne({ IdProducto: id });
@@ -114,12 +114,12 @@ app.delete('/productos/:id', async (req, res) => {
 
 // ========== MANEJO DE ROLES ==========
 
-app.get('/roles', async (req, res) => {
+app.get('/roles', async (req, res) => {  // GET ROLES
   const roles = await Role.find();
   res.json(roles);
 });
 
-app.post('/roles', async (req, res) => {
+app.post('/roles', async (req, res) => {  // POST ROLES
   try {
     const { Nombre, Edit, Add, Delete, View } = req.body;
     const ultimo = await Role.findOne().sort({ IdRole: -1 });
@@ -141,7 +141,7 @@ app.post('/roles', async (req, res) => {
   }
 });
 
-app.put('/roles/:id', async (req, res) => {
+app.put('/roles/:id', async (req, res) => {  // PUT ROLES
   try {
     const actualizado = await Role.findOneAndUpdate(
       { IdRole: parseInt(req.params.id) },
@@ -154,7 +154,7 @@ app.put('/roles/:id', async (req, res) => {
   }
 });
 
-app.delete('/roles/:id', async (req, res) => {
+app.delete('/roles/:id', async (req, res) => {  // DELETE ROLES
   try {
     await Role.deleteOne({ IdRole: parseInt(req.params.id) });
     res.json({ mensaje: 'Rol eliminado' });
