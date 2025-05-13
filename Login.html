@@ -33,7 +33,7 @@
           const email = document.getElementById("email").value;
           const contraseña = document.getElementById("contraseña").value;
 
-          const response = await fetch("http://localhost:3000/register", {
+          const response = await fetch("https://backendstock-le0i.onrender.com/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nombreUsuario, email, contraseña }),

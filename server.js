@@ -24,6 +24,11 @@ mongoose.connect(MONGO_URI, {
 
 // ========== MANEJO DE USUARIOS ==========
 
+app.get('/usuarios', async (req, res) => {
+  const usuarios = await Usuario.find();
+  res.json(usuarios);
+});
+
 app.post('/register', async (req, res) => {
   try {
     const { nombreUsuario, email, contraseña } = req.body;
@@ -44,6 +49,9 @@ app.post('/register', async (req, res) => {
     res.status(500).json({ mensaje: 'Error al registrar usuario', error });
   }
 });
+
+
+
 
 // ========== MANEJO DE PRODUCTOS ==========
 
