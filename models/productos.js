@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const productoShema = new mongoose.Schema({
     IdProducto: Number,
-    Descripcion: String,
+    Descripcion: String, //ver articulo y modelo
     FechaIngreso: String,
     CantidadActual: Number
 });
