@@ -25,9 +25,14 @@ mongoose.connect(MONGO_URI, {
 // ========== MANEJO DE USUARIOS ==========
 
 app.get('/usuarios', async (req, res) => {   //GET USUARIOS
-  const usuarios = await Usuario.find();
-  res.json(usuarios);
+  try {
+    const usuarios = await Usuario.find();
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener usuarios', error });
+  }
 });
+
 
 app.post('/usuarios', async (req, res) => {  //POST USUARIOS
   try {
@@ -49,6 +54,44 @@ app.post('/usuarios', async (req, res) => {  //POST USUARIOS
     res.status(500).json({ mensaje: 'Error al registrar usuario', error });
   }
 });
+
+app.put('/usuarios/:id', async (req, res) => {   //PUT USUARIOS
+  try {
+    const id = parseInt(req.params.id);
+    const { Nombre, Email, Contraseña, IdRol } = req.body;
+
+    const actualizado = await Usuario.findOneAndUpdate(
+      { Id: id },
+      { Nombre, Email, Contraseña, IdRol },
+      { new: true }
+    );
+
+    if (!actualizado) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    res.json({ mensaje: 'Usuario actualizado', usuario: actualizado });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar usuario', error });
+  }
+});
+
+
+app.delete('/usuarios/:id', async (req, res) => {   //DELETE USUARIOS
+  try {
+    const id = parseInt(req.params.id);
+    const eliminado = await Usuario.deleteOne({ Id: id });
+
+    if (eliminado.deletedCount === 0) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    res.json({ mensaje: 'Usuario eliminado' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar usuario', error });
+  }
+});
+
 
 
 
