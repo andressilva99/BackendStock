@@ -37,8 +37,7 @@ app.get('/usuarios', async (req, res) => {   //GET USUARIOS
 app.post('/usuarios', async (req, res) => {  //POST USUARIOS
   try {
     const { nombreUsuario, email, contraseña } = req.body;
-    const idRol = `ROL-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-
+    
     const nuevoUsuario = new Usuario({
       Nombre: nombreUsuario,
       Email: email,
@@ -205,5 +204,34 @@ app.delete('/roles/:id', async (req, res) => {  // DELETE ROLES
     res.status(500).json({ mensaje: 'Error al eliminar rol', error });
   }
 });
+
+//========================== MANEJO DE USUARIOS - BACK Y FRONT =======================================
+
+
+app.post('/login', async (req, res) => {
+  const { usuario, contraseña } = req.body;
+
+  try {
+    const usuarioEncontrado = await Usuario.findOne({
+      $or: [
+        { Nombre: usuario },
+        { Email: usuario }
+      ]
+    });
+
+    if (!usuarioEncontrado) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+
+    if (usuarioEncontrado.Contraseña !== contraseña) {
+      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
+    }
+
+    res.json(usuarioEncontrado);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error en el login', error });
+  }
+});
+
 
 app.listen(3000, () => console.log('🚀 Servidor corriendo en http://localhost:3000'));
